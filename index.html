@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convert PDF to Word & Word to PDF - Simple & Fast</title>
+    <meta name="description" content="Easily convert your PDF files to editable Word documents (DOCX) and Word documents back to PDF online. Fast, free, and secure file conversion.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom styles for drag-over effect */
+        .drag-over {
+            border-color: #3b82f6; /* blue-500 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        /* Style for file input visually hidden but accessible */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        /* Simple progress bar */
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e5e7eb; /* gray-200 */
+            border-radius: 9999px;
+            overflow: hidden;
+            height: 0.75rem; /* h-3 */
+        }
+        .progress-bar {
+            background-color: #3b82f6; /* blue-500 */
+            height: 100%;
+            transition: width 0.3s ease-in-out;
+            border-radius: 9999px;
+        }
+        /* Tab styling */
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            border-color: #3b82f6; /* blue-500 */
+            color: #3b82f6; /* blue-500 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        .tab-button:not(.active):hover {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* Download button style */
+        .download-button {
+            display: inline-block; /* Allows margin */
+            margin-top: 0.5rem; /* Add some space above the button */
+            padding: 0.5rem 1.5rem; /* Adjust padding */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-weight: 700; /* font-bold */
+            color: white;
+            transition: background-color 0.3s ease-in-out;
+            cursor: pointer; /* Indicate it's clickable */
+            text-decoration: none; /* Remove underline from potential <a> tag */
+        }
+        .download-button-pdf {
+             background-color: #2563eb; /* blue-600 */
+        }
+        .download-button-pdf:hover {
+             background-color: #1d4ed8; /* blue-700 */
+        }
+         .download-button-word {
+             background-color: #7e22ce; /* purple-700 */
+        }
+        .download-button-word:hover {
+             background-color: #6b21a8; /* purple-800 */
+        }
+
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <main class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6 md:p-10">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">File Converter</h1>
+            <p class="text-gray-600">Convert PDF to Word (DOCX) and Word to PDF seamlessly.</p>
+        </header>
+
+        <div class="mb-6 border-b border-gray-200">
+            <nav class="flex space-x-2" aria-label="Tabs">
+                <button id="tab-pdf-to-word" onclick="switchTab('pdf-to-word')" class="tab-button active text-gray-600 font-medium px-4 py-3 rounded-t-lg border-b-2 border-transparent text-sm md:text-base" aria-current="page">
+                    PDF to Word
+                </button>
+                <button id="tab-word-to-pdf" onclick="switchTab('word-to-pdf')" class="tab-button text-gray-600 font-medium px-4 py-3 rounded-t-lg border-b-2 border-transparent text-sm md:text-base">
+                    Word to PDF
+                </button>
+            </nav>
+        </div>
+
+        <div>
+            <section id="content-pdf-to-word" class="tab-content active">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Convert PDF to Word (.docx)</h2>
+                <div id="drop-area-pdf" class="drop-area border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 transition duration-300 ease-in-out">
+                    <input type="file" id="file-input-pdf" accept=".pdf" class="visually-hidden" multiple>
+                    <label for="file-input-pdf" class="cursor-pointer">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <p class="mt-2 text-sm text-gray-600">
+                            <span class="font-medium text-blue-600 hover:text-blue-500">Upload a PDF file</span> or drag and drop
+                        </p>
+                        <p class="mt-1 text-xs text-gray-500">PDF up to 50MB</p>
+                    </label>
+                </div>
+                <div id="file-info-pdf" class="mt-4 text-center text-sm text-gray-700 min-h-[1.25rem]"></div> <div id="progress-container-pdf" class="mt-4 hidden">
+                    <div class="progress-bar-container">
+                        <div id="progress-bar-pdf" class="progress-bar" style="width: 0%;"></div>
+                    </div>
+                    <p id="progress-text-pdf" class="text-center text-sm text-gray-600 mt-1">Uploading...</p>
+                </div>
+                <div id="message-pdf" class="mt-4 text-center min-h-[3rem]"></div> <div class="mt-6 text-center">
+                     <button id="convert-button-pdf" onclick="handleConvert('pdf')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Convert to Word
+                    </button>
+                </div>
+            </section>
+
+            <section id="content-word-to-pdf" class="tab-content">
+                 <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Convert Word (.docx) to PDF</h2>
+                <div id="drop-area-word" class="drop-area border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-purple-400 transition duration-300 ease-in-out">
+                    <input type="file" id="file-input-word" accept=".doc,.docx" class="visually-hidden" multiple>
+                     <label for="file-input-word" class="cursor-pointer">
+                         <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <p class="mt-2 text-sm text-gray-600">
+                            <span class="font-medium text-purple-600 hover:text-purple-500">Upload a Word file</span> or drag and drop
+                        </p>
+                        <p class="mt-1 text-xs text-gray-500">DOC or DOCX up to 50MB</p>
+                    </label>
+                </div>
+                 <div id="file-info-word" class="mt-4 text-center text-sm text-gray-700 min-h-[1.25rem]"></div> <div id="progress-container-word" class="mt-4 hidden">
+                    <div class="progress-bar-container">
+                        <div id="progress-bar-word" class="progress-bar bg-purple-600" style="width: 0%;"></div>
+                    </div>
+                     <p id="progress-text-word" class="text-center text-sm text-gray-600 mt-1">Uploading...</p>
+                </div>
+                 <div id="message-word" class="mt-4 text-center min-h-[3rem]"></div> <div class="mt-6 text-center">
+                     <button id="convert-button-word" onclick="handleConvert('word')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Convert to PDF
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <footer class="mt-10 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
+             <p>&copy; <span id="current-year"></span> Your Brand Name. All rights reserved.</p>
+             <p class="mt-2">Providing fast and reliable PDF to Word and Word to PDF conversions.</p>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- State Variables ---
+        let selectedFilePdf = null;
+        let selectedFileWord = null;
+        let currentTab = 'pdf-to-word'; // 'pdf-to-word' or 'word-to-pdf'
+
+        // --- DOM Elements ---
+        const dropAreaPdf = document.getElementById('drop-area-pdf');
+        const fileInputPdf = document.getElementById('file-input-pdf');
+        const fileInfoPdf = document.getElementById('file-info-pdf');
+        const progressContainerPdf = document.getElementById('progress-container-pdf');
+        const progressBarPdf = document.getElementById('progress-bar-pdf');
+        const progressTextPdf = document.getElementById('progress-text-pdf');
+        const messagePdf = document.getElementById('message-pdf');
+        const convertButtonPdf = document.getElementById('convert-button-pdf');
+
+        const dropAreaWord = document.getElementById('drop-area-word');
+        const fileInputWord = document.getElementById('file-input-word');
+        const fileInfoWord = document.getElementById('file-info-word');
+        const progressContainerWord = document.getElementById('progress-container-word');
+        const progressBarWord = document.getElementById('progress-bar-word');
+        const progressTextWord = document.getElementById('progress-text-word');
+        const messageWord = document.getElementById('message-word');
+        const convertButtonWord = document.getElementById('convert-button-word');
+
+        const tabButtonPdf = document.getElementById('tab-pdf-to-word');
+        const tabButtonWord = document.getElementById('tab-word-to-pdf');
+        const contentPdf = document.getElementById('content-pdf-to-word');
+        const contentWord = document.getElementById('content-word-to-pdf');
+
+        const currentYearSpan = document.getElementById('current-year');
+
+        // --- Functions ---
+
+        // Function to switch tabs
+        function switchTab(tabId) {
+            currentTab = tabId;
+
+            // Update button styles
+            tabButtonPdf.classList.toggle('active', tabId === 'pdf-to-word');
+            tabButtonWord.classList.toggle('active', tabId === 'word-to-pdf');
+            tabButtonPdf.setAttribute('aria-current', tabId === 'pdf-to-word' ? 'page' : 'false');
+            tabButtonWord.setAttribute('aria-current', tabId === 'word-to-pdf' ? 'page' : 'false');
+
+            // Update content visibility
+            contentPdf.classList.toggle('active', tabId === 'pdf-to-word');
+            contentWord.classList.toggle('active', tabId === 'word-to-pdf');
+
+            // Reset the other tab's state if needed (optional)
+            // if (tabId === 'pdf-to-word') resetState('word');
+            // else resetState('pdf');
+        }
+
+        // Function to handle file selection and validation
+        function handleFileSelect(event, type) {
+            event.preventDefault(); // Prevent default browser behavior
+            const files = event.target.files || event.dataTransfer.files;
+            const fileInput = (type === 'pdf') ? fileInputPdf : fileInputWord;
+            const allowedType = (type === 'pdf') ? '.pdf' : '.doc,.docx';
+            const maxSizeMB = 50; // Max file size in MB
+
+            if (files.length > 0) {
+                const file = files[0]; // Handle only the first file
+
+                // Basic validation (type and size)
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                const isValidType = (type === 'pdf') ? fileExtension === 'pdf' : (fileExtension === 'doc' || fileExtension === 'docx');
+                const isValidSize = file.size <= maxSizeMB * 1024 * 1024;
+
+                if (!isValidType) {
+                    displayMessage(`Invalid file type. Please upload a ${allowedType.replace(',', ' or ')} file.`, 'error', type);
+                    resetState(type); // Reset if invalid
+                    return;
+                }
+
+                if (!isValidSize) {
+                    displayMessage(`File is too large. Maximum size is ${maxSizeMB}MB.`, 'error', type);
+                    resetState(type); // Reset if invalid
+                    return;
+                }
+
+                // Store the valid file and update UI
+                if (type === 'pdf') {
+                    selectedFilePdf = file;
+                    updateFileInfo(selectedFilePdf, type);
+                    convertButtonPdf.disabled = false; // Enable convert button
+                } else {
+                    selectedFileWord = file;
+                    updateFileInfo(selectedFileWord, type);
+                    convertButtonWord.disabled = false; // Enable convert button
+                }
+                displayMessage('', 'clear', type); // Clear previous messages
+                hideProgress(type); // Hide progress bar initially
+            }
+        }
+
+        // Function to update the file information display
+        function updateFileInfo(file, type) {
+            const fileInfo = (type === 'pdf') ? fileInfoPdf : fileInfoWord;
+            if (file) {
+                fileInfo.textContent = `Selected file: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            } else {
+                fileInfo.textContent = ''; // Clear info if no file
+            }
+        }
+
+        // Function to display messages (success, error, clear) and download button
+        function displayMessage(msg, typeClass, conversionType) {
+            const messageArea = (conversionType === 'pdf') ? messagePdf : messageWord;
+            messageArea.innerHTML = ''; // Clear previous content
+            messageArea.className = 'mt-4 text-center text-sm min-h-[3rem]'; // Reset classes and ensure min-height
+
+            const textElement = document.createElement('p'); // Create a paragraph for the message
+            textElement.textContent = msg;
+
+            if (typeClass === 'error') {
+                textElement.classList.add('text-red-600');
+                messageArea.appendChild(textElement);
+            } else if (typeClass === 'success') {
+                textElement.classList.add('text-green-600');
+                messageArea.appendChild(textElement); // Add the success message
+
+                // Add the download button on success
+                const downloadButton = document.createElement('a'); // Use an anchor tag for the button
+                const buttonStyle = (conversionType === 'pdf') ? 'download-button-pdf' : 'download-button-word';
+                const buttonText = (conversionType === 'pdf') ? 'Download Word File' : 'Download PDF File';
+
+                downloadButton.href = '#'; // Placeholder link for simulation
+                downloadButton.textContent = buttonText;
+                downloadButton.classList.add('download-button', buttonStyle);
+                // Prevent default link behavior for this simulation
+                downloadButton.onclick = (e) => {
+                    e.preventDefault();
+                    alert('Download would start in a real application!'); // Placeholder action
+                };
+
+                messageArea.appendChild(downloadButton); // Add the button below the message
+            } else {
+                 // If typeClass is 'clear' or invalid, messageArea remains empty
+            }
+        }
+
+        // Function to show and update progress
+        function showProgress(percentage, text, type) {
+            const progressContainer = (type === 'pdf') ? progressContainerPdf : progressContainerWord;
+            const progressBar = (type === 'pdf') ? progressBarPdf : progressBarWord;
+            const progressText = (type === 'pdf') ? progressTextPdf : progressTextWord;
+
+            progressContainer.classList.remove('hidden');
+            progressBar.style.width = `${percentage}%`;
+            progressText.textContent = text;
+        }
+
+        // Function to hide progress
+        function hideProgress(type) {
+            const progressContainer = (type === 'pdf') ? progressContainerPdf : progressContainerWord;
+            progressContainer.classList.add('hidden');
+        }
+
+        // Function to reset the state for a specific converter type
+        function resetState(type) {
+            if (type === 'pdf') {
+                selectedFilePdf = null;
+                fileInputPdf.value = ''; // Clear the file input
+                updateFileInfo(null, 'pdf');
+                convertButtonPdf.disabled = true;
+                hideProgress('pdf');
+                displayMessage('', 'clear', 'pdf');
+            } else {
+                selectedFileWord = null;
+                fileInputWord.value = ''; // Clear the file input
+                updateFileInfo(null, 'word');
+                convertButtonWord.disabled = true;
+                hideProgress('word');
+                displayMessage('', 'clear', 'word');
+            }
+        }
+
+
+        // --- Simulation Function ---
+        function simulateConversion(type) {
+            const file = (type === 'pdf') ? selectedFilePdf : selectedFileWord;
+            const convertButton = (type === 'pdf') ? convertButtonPdf : convertButtonWord;
+
+            if (!file) return; // Should not happen if button is enabled, but good practice
+
+            convertButton.disabled = true; // Disable button during conversion
+            displayMessage('', 'clear', type); // Clear previous messages
+
+            let progress = 0;
+            showProgress(progress, 'Uploading...', type);
+
+            // Simulate upload progress
+            const uploadInterval = setInterval(() => {
+                progress += 10;
+                if (progress <= 100) {
+                    showProgress(progress, `Uploading... ${progress}%`, type);
+                } else {
+                    clearInterval(uploadInterval);
+                    showProgress(100, 'Processing...', type); // Indicate processing starts
+
+                    // Simulate backend conversion delay
+                    setTimeout(() => {
+                        // **IMPORTANT:** In a real application, this is where you would
+                        // receive the response from your backend server.
+                        // The backend would perform the actual conversion and
+                        // provide a download link or the converted file.
+
+                        // Simulate success
+                        const success = Math.random() > 0.1; // Simulate occasional failure
+
+                        if (success) {
+                             const convertedFileType = (type === 'pdf') ? 'Word document' : 'PDF file';
+                             // Call displayMessage which now handles adding the download button
+                             displayMessage(`Success! Your ${convertedFileType} is ready.`, 'success', type);
+                             // The download button is added within displayMessage now.
+                        } else {
+                            displayMessage('Conversion failed. Please try again.', 'error', type);
+                        }
+
+                        hideProgress(type); // Hide progress bar after completion/failure
+                        // Optionally reset state after a delay or keep file info
+                        // resetState(type); // Uncomment to fully reset after conversion attempt
+
+                        // Re-enable the convert button regardless of success/failure for retry
+                        if (type === 'pdf') {
+                            convertButtonPdf.disabled = !selectedFilePdf; // Re-enable only if file still selected
+                        } else {
+                            convertButtonWord.disabled = !selectedFileWord; // Re-enable only if file still selected
+                        }
+
+
+                    }, 2000); // Simulate 2 seconds processing time
+                }
+            }, 150); // Simulate upload speed
+        }
+
+        // --- Event Listeners ---
+
+        // Drag and Drop Setup for PDF
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropAreaPdf.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropAreaPdf.addEventListener(eventName, () => dropAreaPdf.classList.add('drag-over'), false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropAreaPdf.addEventListener(eventName, () => dropAreaPdf.classList.remove('drag-over'), false);
+        });
+        dropAreaPdf.addEventListener('drop', (e) => handleFileSelect(e, 'pdf'), false);
+        fileInputPdf.addEventListener('change', (e) => handleFileSelect(e, 'pdf')); // Handle click selection
+
+         // Drag and Drop Setup for Word
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropAreaWord.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropAreaWord.addEventListener(eventName, () => dropAreaWord.classList.add('drag-over'), false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropAreaWord.addEventListener(eventName, () => dropAreaWord.classList.remove('drag-over'), false);
+        });
+        dropAreaWord.addEventListener('drop', (e) => handleFileSelect(e, 'word'), false);
+        fileInputWord.addEventListener('change', (e) => handleFileSelect(e, 'word')); // Handle click selection
+
+
+        // Conversion Button Click Handler (delegates based on current tab)
+        function handleConvert(type) {
+             simulateConversion(type);
+        }
+
+        // --- Initialization ---
+        currentYearSpan.textContent = new Date().getFullYear();
+        // Initial tab setup (redundant due to default class, but safe)
+        switchTab('pdf-to-word');
+
+    </script>
+
+</body>
+</html>
