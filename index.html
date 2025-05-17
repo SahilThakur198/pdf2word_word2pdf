@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Convert PDF to Word & Word to PDF - Simple & Fast</title>
-    <meta name="description" content="Easily convert your PDF files to editable Word documents (DOCX) and Word documents back to PDF online. Fast, free, and secure file conversion.">
+    <title>Comprehensive PDF & Word Toolkit - Convert, Edit, Manage</title>
+    <meta name="description" content="All-in-one toolkit: Convert PDF to Word, Word to PDF, view, merge, split, annotate, fill forms, extract text/images, compress, watermark, protect, sign, search, edit metadata, convert to images, and print PDFs.">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
         }
-        /* Custom styles for drag-over effect */
         .drag-over {
-            border-color: #3b82f6; /* blue-500 */
+            border-color: #60a5fa; /* blue-400 */
             background-color: #eff6ff; /* blue-50 */
         }
-        /* Style for file input visually hidden but accessible */
         .visually-hidden {
             position: absolute;
             width: 1px;
@@ -28,7 +27,6 @@
             white-space: nowrap;
             border-width: 0;
         }
-        /* Simple progress bar */
         .progress-bar-container {
             width: 100%;
             background-color: #e5e7eb; /* gray-200 */
@@ -42,148 +40,448 @@
             transition: width 0.3s ease-in-out;
             border-radius: 9999px;
         }
-        /* Tab styling */
-        .tab-button {
+        .main-tab-button {
             transition: all 0.3s ease;
         }
-        .tab-button.active {
+        .main-tab-button.active {
             border-color: #3b82f6; /* blue-500 */
             color: #3b82f6; /* blue-500 */
             background-color: #eff6ff; /* blue-50 */
         }
-        .tab-button:not(.active):hover {
+        .main-tab-button:not(.active):hover {
             background-color: #f3f4f6; /* gray-100 */
         }
-        .tab-content {
-            display: none;
+        .sub-tab-button {
+            transition: all 0.3s ease;
         }
-        .tab-content.active {
-            display: block;
+        .sub-tab-button.active {
+            border-color: #3b82f6; /* blue-500 */
+            color: #3b82f6; /* blue-500 */
+            background-color: #eff6ff; /* blue-50 */
         }
-        /* Download button style */
-        .download-button {
-            display: inline-block; /* Allows margin */
-            margin-top: 0.5rem; /* Add some space above the button */
-            padding: 0.5rem 1.5rem; /* Adjust padding */
-            border-radius: 0.5rem; /* rounded-lg */
-            font-weight: 700; /* font-bold */
-            color: white;
-            transition: background-color 0.3s ease-in-out;
-            cursor: pointer; /* Indicate it's clickable */
-            text-decoration: none; /* Remove underline from potential <a> tag */
-        }
-        .download-button-pdf {
-             background-color: #2563eb; /* blue-600 */
-        }
-        .download-button-pdf:hover {
-             background-color: #1d4ed8; /* blue-700 */
-        }
-         .download-button-word {
-             background-color: #7e22ce; /* purple-700 */
-        }
-        .download-button-word:hover {
-             background-color: #6b21a8; /* purple-800 */
+        .sub-tab-button:not(.active):hover {
+            background-color: #f3f4f6; /* gray-100 */
         }
 
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tool-content { display: none; }
+        .tool-content.active { display: block; }
+
+        .download-button {
+            display: inline-block; margin-top: 0.5rem; padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem; font-weight: 700; color: white;
+            transition: background-color 0.3s ease-in-out; cursor: pointer; text-decoration: none;
+        }
+        .download-button-generic { background-color: #2563eb; /* blue-600 */ }
+        .download-button-generic:hover { background-color: #1d4ed8; /* blue-700 */ }
+
+        .tool-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .tool-card svg {
+            transition: color 0.3s ease;
+        }
+        .tool-card:hover svg {
+            color: #3b82f6; /* blue-500 */
+        }
+
+        /* For PDF Viewer Canvas */
+        #pdf-viewer-canvas-container {
+            border: 1px solid #d1d5db; /* gray-300 */
+            max-height: 500px;
+            overflow-y: auto;
+            background-color: #f9fafb; /* gray-50 */
+        }
+        #pdf-viewer-canvas {
+            display: block;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        /* For Signature Pad */
+        #signature-pad-canvas {
+            border: 1px dashed #9ca3af; /* gray-400 */
+            cursor: crosshair;
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-gradient-to-br from-blue-100 via-white to-purple-100 min-h-screen flex flex-col items-center justify-center p-4 text-gray-800">
     <!-- Developer button -->
     <div class="fixed top-4 right-4 z-50">
-        <a href="https://sahilthakur198.github.io/Portfolio/" 
-           target="_blank" 
+        <a href="https://sahilthakur198.github.io/Portfolio/"
+           target="_blank"
            class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
             Developer
         </a>
     </div>
 
-    <main class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6 md:p-10">
+    <main class="bg-white rounded-xl shadow-2xl w-full max-w-4xl p-6 md:p-10 my-8">
         <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">File Converter</h1>
-            <p class="text-gray-600">Convert PDF to Word (DOCX) and Word to PDF seamlessly.</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-3">PDF & Word Toolkit</h1>
+            <p class="text-gray-600 text-lg">Your one-stop solution for file conversion and PDF management.</p>
         </header>
 
-        <div class="mb-6 border-b border-gray-200">
-            <nav class="flex space-x-2" aria-label="Tabs">
-                <button id="tab-pdf-to-word" onclick="switchTab('pdf-to-word')" class="tab-button active text-gray-600 font-medium px-4 py-3 rounded-t-lg border-b-2 border-transparent text-sm md:text-base" aria-current="page">
-                    PDF to Word
+        <!-- Main Tabs -->
+        <div class="mb-6 border-b border-gray-300">
+            <nav class="flex space-x-1 md:space-x-2" aria-label="Main Tabs">
+                <button id="main-tab-converters" onclick="switchMainTab('converters')" class="main-tab-button active font-medium px-3 py-3 md:px-6 md:py-4 rounded-t-lg border-b-2 border-transparent text-sm md:text-base" aria-current="page">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1 md:mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm3.5 2.5a.5.5 0 000 1h5a.5.5 0 000-1h-5zM9 14a1 1 0 01-.707-.293l-2-2a.5.5 0 01.707-.707L9 12.793l4.707-4.707a.5.5 0 01.707.707l-5 5A1 1 0 019 14zm0-5a.5.5 0 000 1h2a.5.5 0 000-1H9z" clip-rule="evenodd" /></svg>
+                    File Converters
                 </button>
-                <button id="tab-word-to-pdf" onclick="switchTab('word-to-pdf')" class="tab-button text-gray-600 font-medium px-4 py-3 rounded-t-lg border-b-2 border-transparent text-sm md:text-base">
-                    Word to PDF
+                <button id="main-tab-pdf-tools" onclick="switchMainTab('pdf-tools')" class="main-tab-button font-medium px-3 py-3 md:px-6 md:py-4 rounded-t-lg border-b-2 border-transparent text-sm md:text-base">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1 md:mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-3.03L5 18V4z" /></svg>
+                    PDF Tools
                 </button>
             </nav>
         </div>
 
-        <div>
-            <section id="content-pdf-to-word" class="tab-content active">
-                <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Convert PDF to Word (.docx)</h2>
-                <div id="drop-area-pdf" class="drop-area border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 transition duration-300 ease-in-out">
-                    <input type="file" id="file-input-pdf" accept=".pdf" class="visually-hidden" multiple>
-                    <label for="file-input-pdf" class="cursor-pointer">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <p class="mt-2 text-sm text-gray-600">
-                            <span class="font-medium text-blue-600 hover:text-blue-500">Upload a PDF file</span> or drag and drop
-                        </p>
-                        <p class="mt-1 text-xs text-gray-500">PDF up to 50MB</p>
-                    </label>
-                </div>
-                <div id="file-info-pdf" class="mt-4 text-center text-sm text-gray-700 min-h-[1.25rem]"></div> <div id="progress-container-pdf" class="mt-4 hidden">
-                    <div class="progress-bar-container">
-                        <div id="progress-bar-pdf" class="progress-bar" style="width: 0%;"></div>
-                    </div>
-                    <p id="progress-text-pdf" class="text-center text-sm text-gray-600 mt-1">Uploading...</p>
-                </div>
-                <div id="message-pdf" class="mt-4 text-center min-h-[3rem]"></div> <div class="mt-6 text-center">
-                     <button id="convert-button-pdf" onclick="handleConvert('pdf')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                        Convert to Word
+        <!-- Main Content Area -->
+        <div id="main-content-converters" class="main-content active">
+            <!-- Sub Tabs for Converters -->
+            <div class="mb-6 border-b border-gray-200">
+                <nav class="flex space-x-1 md:space-x-2" aria-label="Converter Tabs">
+                    <button id="tab-pdf-to-word" onclick="switchConverterTab('pdf-to-word')" class="sub-tab-button active text-gray-600 font-medium px-3 py-3 md:px-4 rounded-t-lg border-b-2 border-transparent text-sm md:text-base" aria-current="page">
+                        PDF to Word
                     </button>
-                </div>
-            </section>
-
-            <section id="content-word-to-pdf" class="tab-content">
-                 <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Convert Word (.docx) to PDF</h2>
-                <div id="drop-area-word" class="drop-area border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-purple-400 transition duration-300 ease-in-out">
-                    <input type="file" id="file-input-word" accept=".doc,.docx" class="visually-hidden" multiple>
-                     <label for="file-input-word" class="cursor-pointer">
-                         <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <p class="mt-2 text-sm text-gray-600">
-                            <span class="font-medium text-purple-600 hover:text-purple-500">Upload a Word file</span> or drag and drop
-                        </p>
-                        <p class="mt-1 text-xs text-gray-500">DOC or DOCX up to 50MB</p>
-                    </label>
-                </div>
-                 <div id="file-info-word" class="mt-4 text-center text-sm text-gray-700 min-h-[1.25rem]"></div> <div id="progress-container-word" class="mt-4 hidden">
-                    <div class="progress-bar-container">
-                        <div id="progress-bar-word" class="progress-bar bg-purple-600" style="width: 0%;"></div>
-                    </div>
-                     <p id="progress-text-word" class="text-center text-sm text-gray-600 mt-1">Uploading...</p>
-                </div>
-                 <div id="message-word" class="mt-4 text-center min-h-[3rem]"></div> <div class="mt-6 text-center">
-                     <button id="convert-button-word" onclick="handleConvert('word')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                        Convert to PDF
+                    <button id="tab-word-to-pdf" onclick="switchConverterTab('word-to-pdf')" class="sub-tab-button text-gray-600 font-medium px-3 py-3 md:px-4 rounded-t-lg border-b-2 border-transparent text-sm md:text-base">
+                        Word to PDF
                     </button>
-                </div>
-            </section>
+                </nav>
+            </div>
+            <div>
+                <section id="content-pdf-to-word" class="tab-content active">
+                    <!-- Existing PDF to Word content, styles updated -->
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-6 text-center">Convert PDF to Word (.docx)</h2>
+                    <div id="drop-area-pdf" class="drop-area border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition duration-300 ease-in-out bg-gray-50 hover:bg-blue-50">
+                        <input type="file" id="file-input-pdf" accept=".pdf" class="visually-hidden" multiple>
+                        <label for="file-input-pdf" class="cursor-pointer">
+                            <svg class="mx-auto h-16 w-16 text-gray-400 group-hover:text-blue-500 transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                            <p class="mt-2 text-sm text-gray-600"><span class="font-medium text-blue-600 hover:text-blue-500">Upload a PDF file</span> or drag and drop</p>
+                            <p class="mt-1 text-xs text-gray-500">PDF up to 50MB</p>
+                        </label>
+                    </div>
+                    <div id="file-info-pdf" class="mt-4 text-center text-sm text-gray-700 min-h-[1.25rem]"></div>
+                    <div id="progress-container-pdf" class="mt-4 hidden"><div class="progress-bar-container"><div id="progress-bar-pdf" class="progress-bar" style="width: 0%;"></div></div><p id="progress-text-pdf" class="text-center text-sm text-gray-600 mt-1">Uploading...</p></div>
+                    <div id="message-pdf" class="mt-4 text-center min-h-[3rem]"></div>
+                    <div class="mt-6 text-center">
+                        <button id="convert-button-pdf" onclick="handleConvert('pdf')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed text-base" disabled>Convert to Word</button>
+                    </div>
+                </section>
+                <section id="content-word-to-pdf" class="tab-content">
+                    <!-- Existing Word to PDF content, styles updated -->
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-6 text-center">Convert Word (.docx, .doc) to PDF</h2>
+                    <div id="drop-area-word" class="drop-area border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-purple-500 transition duration-300 ease-in-out bg-gray-50 hover:bg-purple-50">
+                        <input type="file" id="file-input-word" accept=".doc,.docx" class="visually-hidden" multiple>
+                        <label for="file-input-word" class="cursor-pointer">
+                            <svg class="mx-auto h-16 w-16 text-gray-400 group-hover:text-purple-500 transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                            <p class="mt-2 text-sm text-gray-600"><span class="font-medium text-purple-600 hover:text-purple-500">Upload a Word file</span> or drag and drop</p>
+                            <p class="mt-1 text-xs text-gray-500">DOC or DOCX up to 50MB</p>
+                        </label>
+                    </div>
+                    <div id="file-info-word" class="mt-4 text-center text-sm text-gray-700 min-h-[1.25rem]"></div>
+                    <div id="progress-container-word" class="mt-4 hidden"><div class="progress-bar-container"><div id="progress-bar-word" class="progress-bar bg-purple-600" style="width: 0%;"></div></div><p id="progress-text-word" class="text-center text-sm text-gray-600 mt-1">Uploading...</p></div>
+                    <div id="message-word" class="mt-4 text-center min-h-[3rem]"></div>
+                    <div class="mt-6 text-center">
+                        <button id="convert-button-word" onclick="handleConvert('word')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed text-base" disabled>Convert to PDF</button>
+                    </div>
+                </section>
+            </div>
         </div>
 
-        <footer class="mt-10 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
-             <p>&copy; <span id="current-year"></span> Your Brand Name. All rights reserved.</p>
-             <p class="mt-2">Providing fast and reliable PDF to Word and Word to PDF conversions.</p>
-        </footer>
+        <div id="main-content-pdf-tools" class="main-content">
+            <div id="pdf-tools-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Tool Cards: data-tool attribute matches the ID of the tool's content section -->
+                <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-pdf-viewer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">PDF Viewer</h3>
+                    <p class="text-sm text-gray-500">Display PDFs with navigation (zoom, scroll).</p>
+                </div>
+                <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-merge-pdfs">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2z" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">Merge PDFs</h3>
+                    <p class="text-sm text-gray-500">Combine multiple PDFs into one file.</p>
+                </div>
+                <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-split-pdf">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19M4.879 4.879L9.757 9.757m0 0A3.502 3.502 0 017.5 12.5c0 1.933 1.567 3.5 3.5 3.5s3.5-1.567 3.5-3.5c0-.5-.108-.98-.305-1.425L19.5 5.5 14.5.5l-5.25 5.25zM12 12.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">Split PDF</h3>
+                    <p class="text-sm text-gray-500">Extract or split pages into separate files.</p>
+                </div>
+                <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-pdf-annotation">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">PDF Annotation</h3>
+                    <p class="text-sm text-gray-500">Add text, highlights, or shapes to PDFs.</p>
+                </div>
+                <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-fill-forms">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">Fill PDF Forms</h3>
+                    <p class="text-sm text-gray-500">Edit interactive form fields.</p>
+                </div>
+                 <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-text-extraction">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6M9 12l2-2.5M9 12l2 2.5M12 9v6M4 7v10a2 2 0 002 2h12a2 2 0 002-2V7M16 3h-3.278A2 2 0 0010.89 1.11L9.89 0H6.11L5.11 1.11A2 2 0 003.278 3H0v2h24V3h-8z" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">Text Extraction</h3>
+                    <p class="text-sm text-gray-500">Extract text content from PDFs.</p>
+                </div>
+                <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-image-extraction">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">Image Extraction</h3>
+                    <p class="text-sm text-gray-500">Extract embedded images from PDFs.</p>
+                </div>
+                <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-pdf-compression">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">PDF Compression</h3>
+                    <p class="text-sm text-gray-500">Reduce PDF file size.</p>
+                </div>
+                <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-add-watermarks">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-15.66l-.707.707M4.049 19.951l-.707.707M21 12h-1M4 12H3m15.66 8.66l-.707-.707M4.049 4.049l-.707-.707" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">Add Watermarks</h3>
+                    <p class="text-sm text-gray-500">Overlay text or images on PDF pages.</p>
+                </div>
+                <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-password-protection">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">Password Protection</h3>
+                    <p class="text-sm text-gray-500">Encrypt or decrypt PDFs.</p>
+                </div>
+                <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-digital-signatures">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">Digital Signatures</h3>
+                    <p class="text-sm text-gray-500">Draw and embed signatures.</p>
+                </div>
+                <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-search-pdf">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">Search in PDF</h3>
+                    <p class="text-sm text-gray-500">Find and highlight text in a PDF.</p>
+                </div>
+                <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-metadata-editing">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 012-2h2a2 2 0 012 2v1m-4 0h4" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">Metadata Editing</h3>
+                    <p class="text-sm text-gray-500">Edit author, title, creation date, etc.</p>
+                </div>
+                <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-pdf-to-images">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">PDF to Images</h3>
+                    <p class="text-sm text-gray-500">Export PDF pages as PNG/JPEG.</p>
+                </div>
+                 <div class="tool-card bg-white p-6 rounded-lg shadow-lg border border-gray-200" data-tool="tool-print-pdf">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                    <h3 class="text-xl font-semibold mb-1 text-gray-700">Print PDF</h3>
+                    <p class="text-sm text-gray-500">Trigger browser print dialog for PDFs.</p>
+                </div>
+            </div>
 
+            <!-- Placeholder sections for each tool's UI -->
+            <div id="pdf-tool-content-area" class="mt-8">
+                 <button id="back-to-tools-button" class="mb-6 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg inline-flex items-center hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
+                    Back to Tools
+                </button>
+
+                <!-- UI for PDF Viewer -->
+                <section id="tool-pdf-viewer" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">PDF Viewer</h2>
+                    <p class="text-gray-600 mb-4">Upload a PDF to view it in your browser. Use pdf.js for rendering.</p>
+                    <input type="file" id="viewer-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4"/>
+                    <div class="flex justify-center space-x-2 mb-2">
+                        <button id="viewer-prev-page" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Prev</button>
+                        <span id="viewer-page-num" class="px-4 py-2">0</span> / <span id="viewer-page-count" class="px-4 py-2">0</span>
+                        <button id="viewer-next-page" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Next</button>
+                        <button id="viewer-zoom-in" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Zoom In</button>
+                        <button id="viewer-zoom-out" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Zoom Out</button>
+                    </div>
+                    <div id="pdf-viewer-canvas-container" class="w-full h-96 border rounded overflow-auto bg-gray-100">
+                        <canvas id="pdf-viewer-canvas"></canvas>
+                    </div>
+                    <div id="message-viewer" class="mt-4 text-center min-h-[1.5rem]"></div>
+                </section>
+
+                <!-- UI for Merge PDFs -->
+                <section id="tool-merge-pdfs" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Merge PDFs</h2>
+                    <p class="text-gray-600 mb-4">Select multiple PDF files to combine them into a single document. Uses pdf-lib.</p>
+                    <input type="file" id="merge-file-input" accept=".pdf" multiple class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4"/>
+                    <div id="merge-file-list" class="mb-4 text-sm text-gray-700"></div>
+                    <button id="merge-action-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Merge PDFs</button>
+                    <div id="message-merge" class="mt-4 text-center min-h-[3rem]"></div>
+                </section>
+
+                <!-- UI for Split PDF -->
+                <section id="tool-split-pdf" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Split PDF</h2>
+                    <p class="text-gray-600 mb-4">Upload a PDF and specify page ranges to split. Uses pdf-lib.</p>
+                    <input type="file" id="split-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4"/>
+                    <input type="text" id="split-page-ranges" placeholder="e.g., 1-3, 5, 7-end" class="w-full p-2 border rounded mb-4">
+                    <button id="split-action-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Split PDF</button>
+                    <div id="message-split" class="mt-4 text-center min-h-[3rem]"></div>
+                </section>
+
+                <!-- UI for PDF Annotation -->
+                <section id="tool-pdf-annotation" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">PDF Annotation</h2>
+                    <p class="text-gray-600 mb-4">Add text, highlights, or shapes. Uses pdf-lib. (Viewer for selection, then modification)</p>
+                    <input type="file" id="annotate-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4"/>
+                    <div class="mb-2">Annotation Tools: (UI for text input, color pickers, shape selectors would go here)</div>
+                    <button id="annotate-action-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save Annotations</button>
+                    <div id="message-annotate" class="mt-4 text-center min-h-[3rem]"></div>
+                </section>
+
+                <!-- UI for Fill PDF Forms -->
+                <section id="tool-fill-forms" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Fill PDF Forms</h2>
+                    <p class="text-gray-600 mb-4">Edit interactive form fields in a PDF. Uses pdf-lib and pdf.js for rendering fields.</p>
+                    <input type="file" id="fillform-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4"/>
+                    <!-- Form fields would be rendered here -->
+                    <button id="fillform-action-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save Filled Form</button>
+                    <div id="message-fillform" class="mt-4 text-center min-h-[3rem]"></div>
+                </section>
+
+                <!-- UI for Text Extraction -->
+                <section id="tool-text-extraction" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Text Extraction</h2>
+                    <p class="text-gray-600 mb-4">Extract all text content from a PDF. Uses pdf.js.</p>
+                    <input type="file" id="extracttext-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4"/>
+                    <button id="extracttext-action-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Extract Text</button>
+                    <textarea id="extracted-text-area" readonly class="w-full h-40 p-2 border rounded mt-4 bg-gray-50"></textarea>
+                    <div id="message-extracttext" class="mt-4 text-center min-h-[3rem]"></div>
+                </section>
+
+                <!-- UI for Image Extraction -->
+                <section id="tool-image-extraction" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Image Extraction</h2>
+                    <p class="text-gray-600 mb-4">Extract embedded images from PDF pages. Uses pdf.js or similar.</p>
+                    <input type="file" id="extractimage-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4"/>
+                    <button id="extractimage-action-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Extract Images</button>
+                    <div id="extracted-images-container" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                    <div id="message-extractimage" class="mt-4 text-center min-h-[3rem]"></div>
+                </section>
+
+                 <!-- UI for PDF Compression -->
+                <section id="tool-pdf-compression" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">PDF Compression</h2>
+                    <p class="text-gray-600 mb-4">Reduce file size by optimizing images/text. Client-side is limited, pdf-lib can do some image optimization.</p>
+                    <input type="file" id="compress-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4"/>
+                    <label for="compression-level" class="block mb-2 text-sm font-medium text-gray-900">Compression Level:</label>
+                    <select id="compression-level" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-4">
+                        <option value="low">Low (Faster, less compression)</option>
+                        <option value="medium" selected>Medium (Balanced)</option>
+                        <option value="high">High (Slower, more compression)</option>
+                    </select>
+                    <button id="compress-action-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Compress PDF</button>
+                    <div id="message-compress" class="mt-4 text-center min-h-[3rem]"></div>
+                </section>
+
+                <!-- UI for Add Watermarks -->
+                <section id="tool-add-watermarks" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Add Watermarks</h2>
+                    <p class="text-gray-600 mb-4">Overlay text or an image onto PDF pages. Uses pdf-lib.</p>
+                    <input type="file" id="watermark-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-2"/>
+                    <input type="text" id="watermark-text" placeholder="Watermark Text" class="w-full p-2 border rounded mb-2">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Or Upload Watermark Image:</label>
+                    <input type="file" id="watermark-image-input" accept="image/png, image/jpeg" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 mb-4"/>
+                    <button id="watermark-action-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Watermark</button>
+                    <div id="message-watermark" class="mt-4 text-center min-h-[3rem]"></div>
+                </section>
+
+                <!-- UI for Password Protection -->
+                <section id="tool-password-protection" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Password Protection</h2>
+                    <p class="text-gray-600 mb-4">Encrypt or Decrypt a PDF with a password. Uses pdf-lib.</p>
+                    <input type="file" id="password-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-2"/>
+                    <input type="password" id="pdf-password" placeholder="Enter Password" class="w-full p-2 border rounded mb-2">
+                    <input type="password" id="pdf-owner-password" placeholder="Enter Owner Password (optional for encryption)" class="w-full p-2 border rounded mb-4">
+                    <div class="flex space-x-2">
+                        <button id="encrypt-action-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Encrypt PDF</button>
+                        <button id="decrypt-action-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Decrypt PDF</button>
+                    </div>
+                    <div id="message-password" class="mt-4 text-center min-h-[3rem]"></div>
+                </section>
+
+                <!-- UI for Digital Signatures -->
+                <section id="tool-digital-signatures" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Digital Signatures</h2>
+                    <p class="text-gray-600 mb-4">Draw your signature and embed it into a PDF. Uses HTML Canvas & pdf-lib.</p>
+                    <input type="file" id="signature-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4"/>
+                    <p class="mb-2">Draw your signature below:</p>
+                    <canvas id="signature-pad-canvas" width="400" height="200" class="bg-white border border-gray-300 rounded mb-2"></canvas>
+                    <button id="clear-signature-button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mr-2">Clear</button>
+                    <button id="signature-action-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Sign PDF</button>
+                    <div id="message-signature" class="mt-4 text-center min-h-[3rem]"></div>
+                </section>
+
+                <!-- UI for Search in PDF -->
+                <section id="tool-search-pdf" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Search in PDF</h2>
+                    <p class="text-gray-600 mb-4">Find and highlight text within a PDF. Requires PDF viewer with search (pdf.js).</p>
+                    <input type="file" id="searchpdf-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-2"/>
+                    <input type="text" id="searchpdf-query" placeholder="Search text..." class="w-full p-2 border rounded mb-4">
+                    <button id="searchpdf-action-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Search</button>
+                    <!-- Search results could be displayed in a viewer or as a list -->
+                    <div id="message-searchpdf" class="mt-4 text-center min-h-[3rem]"></div>
+                </section>
+
+                <!-- UI for Metadata Editing -->
+                <section id="tool-metadata-editing" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Metadata Editing</h2>
+                    <p class="text-gray-600 mb-4">Edit PDF metadata like Author, Title, Subject, Keywords. Uses pdf-lib.</p>
+                    <input type="file" id="metadata-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4"/>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <input type="text" id="metadata-title" placeholder="Title" class="w-full p-2 border rounded">
+                        <input type="text" id="metadata-author" placeholder="Author" class="w-full p-2 border rounded">
+                        <input type="text" id="metadata-subject" placeholder="Subject" class="w-full p-2 border rounded">
+                        <input type="text" id="metadata-keywords" placeholder="Keywords (comma separated)" class="w-full p-2 border rounded">
+                    </div>
+                    <button id="metadata-action-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save Metadata</button>
+                    <div id="message-metadata" class="mt-4 text-center min-h-[3rem]"></div>
+                </section>
+
+                <!-- UI for Convert PDF to Images -->
+                <section id="tool-pdf-to-images" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Convert PDF to Images</h2>
+                    <p class="text-gray-600 mb-4">Export PDF pages as PNG or JPEG images. Uses pdf.js to render pages to canvas, then export.</p>
+                    <input type="file" id="pdftoimage-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-2"/>
+                    <select id="pdftoimage-format" class="w-full p-2 border rounded mb-4">
+                        <option value="png" selected>PNG</option>
+                        <option value="jpeg">JPEG</option>
+                    </select>
+                    <button id="pdftoimage-action-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Convert to Images</button>
+                    <div id="message-pdftoimage" class="mt-4 text-center min-h-[3rem]"></div>
+                    <div id="pdftoimage-output-container" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                </section>
+
+                <!-- UI for Print PDF -->
+                <section id="tool-print-pdf" class="tool-content">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Print PDF</h2>
+                    <p class="text-gray-600 mb-4">Upload a PDF and trigger the browser's print dialog.</p>
+                    <input type="file" id="print-file-input" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4"/>
+                    <button id="print-action-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Print PDF</button>
+                    <div id="message-print" class="mt-4 text-center min-h-[3rem]"></div>
+                </section>
+            </div>
+        </div>
+
+        <footer class="mt-10 pt-6 border-t border-gray-300 text-center text-gray-500 text-sm">
+             <p>&copy; <span id="current-year"></span> PDF & Word Toolkit. All rights reserved.</p>
+             <p class="mt-2">Empowering your document workflows with simplicity and speed.</p>
+        </footer>
     </main>
+
+    <!-- Include pdf.js and pdf-lib (example, you'd host or use CDN) -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script> -->
+    <!-- <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js';</script> -->
+    <!-- <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script> -->
 
     <script>
         // --- State Variables ---
         let selectedFilePdf = null;
         let selectedFileWord = null;
-        let currentTab = 'pdf-to-word'; // 'pdf-to-word' or 'word-to-pdf'
+        let currentConverterTab = 'pdf-to-word';
+        let currentMainTab = 'converters'; // 'converters' or 'pdf-tools'
+        let activePdfTool = null; // Stores the ID of the currently active PDF tool UI
 
-        // --- DOM Elements ---
+        // --- DOM Elements (Converters) ---
         const dropAreaPdf = document.getElementById('drop-area-pdf');
         const fileInputPdf = document.getElementById('file-input-pdf');
         const fileInfoPdf = document.getElementById('file-info-pdf');
@@ -202,125 +500,156 @@
         const messageWord = document.getElementById('message-word');
         const convertButtonWord = document.getElementById('convert-button-word');
 
-        const tabButtonPdf = document.getElementById('tab-pdf-to-word');
-        const tabButtonWord = document.getElementById('tab-word-to-pdf');
-        const contentPdf = document.getElementById('content-pdf-to-word');
-        const contentWord = document.getElementById('content-word-to-pdf');
+        const converterTabButtonPdf = document.getElementById('tab-pdf-to-word');
+        const converterTabButtonWord = document.getElementById('tab-word-to-pdf');
+        const contentPdfToWord = document.getElementById('content-pdf-to-word');
+        const contentWordToPdf = document.getElementById('content-word-to-pdf');
+
+        // --- DOM Elements (Main Tabs & PDF Tools) ---
+        const mainTabConverters = document.getElementById('main-tab-converters');
+        const mainTabPdfTools = document.getElementById('main-tab-pdf-tools');
+        const mainContentConverters = document.getElementById('main-content-converters');
+        const mainContentPdfTools = document.getElementById('main-content-pdf-tools');
+
+        const pdfToolsGrid = document.getElementById('pdf-tools-grid');
+        const pdfToolContentArea = document.getElementById('pdf-tool-content-area');
+        const backToToolsButton = document.getElementById('back-to-tools-button');
+        const toolCards = document.querySelectorAll('.tool-card');
+        const toolContentSections = document.querySelectorAll('.tool-content');
 
         const currentYearSpan = document.getElementById('current-year');
 
-        // --- Functions ---
+        // --- Generic Utility Functions ---
+        function displayUserMessage(areaElementId, msg, typeClass = 'info', addDownloadLink = null, downloadFileName = 'downloaded-file') {
+            const messageArea = document.getElementById(areaElementId);
+            if (!messageArea) {
+                console.error("Message area not found:", areaElementId);
+                return;
+            }
+            messageArea.innerHTML = ''; // Clear previous content
+            // Reset classes, min-h-[1.5rem] for tool messages, min-h-[3rem] for converters
+            messageArea.className = `mt-4 text-center text-sm ${areaElementId.includes('message-pdf') || areaElementId.includes('message-word') ? 'min-h-[3rem]' : 'min-h-[1.5rem]'}`;
 
-        // Function to switch tabs
-        function switchTab(tabId) {
-            currentTab = tabId;
 
-            // Update button styles
-            tabButtonPdf.classList.toggle('active', tabId === 'pdf-to-word');
-            tabButtonWord.classList.toggle('active', tabId === 'word-to-pdf');
-            tabButtonPdf.setAttribute('aria-current', tabId === 'pdf-to-word' ? 'page' : 'false');
-            tabButtonWord.setAttribute('aria-current', tabId === 'word-to-pdf' ? 'page' : 'false');
+            const textElement = document.createElement('p');
+            textElement.textContent = msg;
 
-            // Update content visibility
-            contentPdf.classList.toggle('active', tabId === 'pdf-to-word');
-            contentWord.classList.toggle('active', tabId === 'word-to-pdf');
+            if (typeClass === 'error') textElement.classList.add('text-red-600', 'font-semibold');
+            else if (typeClass === 'success') textElement.classList.add('text-green-600', 'font-semibold');
+            else if (typeClass === 'info') textElement.classList.add('text-blue-600');
+            else textElement.classList.add('text-gray-700'); // Default
 
-            // Reset the other tab's state if needed (optional)
-            // if (tabId === 'pdf-to-word') resetState('word');
-            // else resetState('pdf');
+            messageArea.appendChild(textElement);
+
+            if (addDownloadLink && typeClass === 'success') {
+                const downloadButton = document.createElement('a');
+                downloadButton.href = addDownloadLink; // Could be a blob URL
+                downloadButton.textContent = `Download ${downloadFileName}`;
+                downloadButton.setAttribute('download', downloadFileName);
+                downloadButton.classList.add('download-button', 'download-button-generic', 'bg-green-600', 'hover:bg-green-700');
+                // For simulation if addDownloadLink is '#':
+                if (addDownloadLink === '#') {
+                    downloadButton.onclick = (e) => {
+                        e.preventDefault();
+                        alert(`Download would start for ${downloadFileName} in a real application!`);
+                    };
+                }
+                messageArea.appendChild(downloadButton);
+            }
         }
 
-        // Function to handle file selection and validation
+        function showToolProgress(toolPrefix, percentage, text) {
+            // Placeholder - Each tool would need its own progress bar elements
+            // For now, we can use a generic message area
+            displayUserMessage(`message-${toolPrefix}`, `${text} - ${percentage}%`, 'info');
+            if (percentage >= 100 && !text.toLowerCase().includes('failed')) {
+                 // Optionally clear progress text or show completion if there's a dedicated progress text element
+            }
+        }
+        function hideToolProgress(toolPrefix) {
+            // Placeholder - Clear specific progress UI for the tool
+            // displayUserMessage(`message-${toolPrefix}`, '', 'clear');
+        }
+
+
+        // --- Main Tab Switching ---
+        function switchMainTab(tabId) {
+            currentMainTab = tabId;
+            mainTabConverters.classList.toggle('active', tabId === 'converters');
+            mainTabPdfTools.classList.toggle('active', tabId === 'pdf-tools');
+
+            mainContentConverters.classList.toggle('active', tabId === 'converters');
+            mainContentPdfTools.classList.toggle('active', tabId === 'pdf-tools');
+
+            if (tabId === 'pdf-tools') {
+                showPdfToolsGrid(); // Ensure grid is visible when switching to PDF tools
+            }
+        }
+
+        // --- Converter Tab Switching ---
+        function switchConverterTab(tabId) {
+            currentConverterTab = tabId;
+            converterTabButtonPdf.classList.toggle('active', tabId === 'pdf-to-word');
+            converterTabButtonWord.classList.toggle('active', tabId === 'word-to-pdf');
+            converterTabButtonPdf.setAttribute('aria-current', tabId === 'pdf-to-word' ? 'page' : 'false');
+            converterTabButtonWord.setAttribute('aria-current', tabId === 'word-to-pdf' ? 'page' : 'false');
+
+            contentPdfToWord.classList.toggle('active', tabId === 'pdf-to-word');
+            contentWordToPdf.classList.toggle('active', tabId === 'word-to-pdf');
+        }
+
+
+        // --- File Converter Functions (Existing, slightly adapted message function) ---
         function handleFileSelect(event, type) {
-            event.preventDefault(); // Prevent default browser behavior
+            event.preventDefault();
             const files = event.target.files || event.dataTransfer.files;
             const fileInput = (type === 'pdf') ? fileInputPdf : fileInputWord;
             const allowedType = (type === 'pdf') ? '.pdf' : '.doc,.docx';
-            const maxSizeMB = 50; // Max file size in MB
+            const maxSizeMB = 50;
 
             if (files.length > 0) {
-                const file = files[0]; // Handle only the first file
-
-                // Basic validation (type and size)
+                const file = files[0];
                 const fileExtension = file.name.split('.').pop().toLowerCase();
                 const isValidType = (type === 'pdf') ? fileExtension === 'pdf' : (fileExtension === 'doc' || fileExtension === 'docx');
                 const isValidSize = file.size <= maxSizeMB * 1024 * 1024;
 
+                const messageAreaId = (type === 'pdf') ? 'message-pdf' : 'message-word';
+
                 if (!isValidType) {
-                    displayMessage(`Invalid file type. Please upload a ${allowedType.replace(',', ' or ')} file.`, 'error', type);
-                    resetState(type); // Reset if invalid
+                    displayUserMessage(messageAreaId, `Invalid file type. Please upload a ${allowedType.replace(',', ' or ')} file.`, 'error');
+                    resetConverterState(type);
                     return;
                 }
-
                 if (!isValidSize) {
-                    displayMessage(`File is too large. Maximum size is ${maxSizeMB}MB.`, 'error', type);
-                    resetState(type); // Reset if invalid
+                    displayUserMessage(messageAreaId, `File is too large. Maximum size is ${maxSizeMB}MB.`, 'error');
+                    resetConverterState(type);
                     return;
                 }
 
-                // Store the valid file and update UI
                 if (type === 'pdf') {
                     selectedFilePdf = file;
                     updateFileInfo(selectedFilePdf, type);
-                    convertButtonPdf.disabled = false; // Enable convert button
+                    convertButtonPdf.disabled = false;
                 } else {
                     selectedFileWord = file;
                     updateFileInfo(selectedFileWord, type);
-                    convertButtonWord.disabled = false; // Enable convert button
+                    convertButtonWord.disabled = false;
                 }
-                displayMessage('', 'clear', type); // Clear previous messages
-                hideProgress(type); // Hide progress bar initially
+                displayUserMessage(messageAreaId, '', 'clear');
+                hideConverterProgress(type);
             }
         }
 
-        // Function to update the file information display
         function updateFileInfo(file, type) {
             const fileInfo = (type === 'pdf') ? fileInfoPdf : fileInfoWord;
             if (file) {
-                fileInfo.textContent = `Selected file: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                fileInfo.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
             } else {
-                fileInfo.textContent = ''; // Clear info if no file
+                fileInfo.textContent = '';
             }
         }
 
-        // Function to display messages (success, error, clear) and download button
-        function displayMessage(msg, typeClass, conversionType) {
-            const messageArea = (conversionType === 'pdf') ? messagePdf : messageWord;
-            messageArea.innerHTML = ''; // Clear previous content
-            messageArea.className = 'mt-4 text-center text-sm min-h-[3rem]'; // Reset classes and ensure min-height
-
-            const textElement = document.createElement('p'); // Create a paragraph for the message
-            textElement.textContent = msg;
-
-            if (typeClass === 'error') {
-                textElement.classList.add('text-red-600');
-                messageArea.appendChild(textElement);
-            } else if (typeClass === 'success') {
-                textElement.classList.add('text-green-600');
-                messageArea.appendChild(textElement); // Add the success message
-
-                // Add the download button on success
-                const downloadButton = document.createElement('a'); // Use an anchor tag for the button
-                const buttonStyle = (conversionType === 'pdf') ? 'download-button-pdf' : 'download-button-word';
-                const buttonText = (conversionType === 'pdf') ? 'Download Word File' : 'Download PDF File';
-
-                downloadButton.href = '#'; // Placeholder link for simulation
-                downloadButton.textContent = buttonText;
-                downloadButton.classList.add('download-button', buttonStyle);
-                // Prevent default link behavior for this simulation
-                downloadButton.onclick = (e) => {
-                    e.preventDefault();
-                    alert('Download would start in a real application!'); // Placeholder action
-                };
-
-                messageArea.appendChild(downloadButton); // Add the button below the message
-            } else {
-                 // If typeClass is 'clear' or invalid, messageArea remains empty
-            }
-        }
-
-        // Function to show and update progress
-        function showProgress(percentage, text, type) {
+        function showConverterProgress(percentage, text, type) {
             const progressContainer = (type === 'pdf') ? progressContainerPdf : progressContainerWord;
             const progressBar = (type === 'pdf') ? progressBarPdf : progressBarWord;
             const progressText = (type === 'pdf') ? progressTextPdf : progressTextWord;
@@ -330,136 +659,539 @@
             progressText.textContent = text;
         }
 
-        // Function to hide progress
-        function hideProgress(type) {
+        function hideConverterProgress(type) {
             const progressContainer = (type === 'pdf') ? progressContainerPdf : progressContainerWord;
             progressContainer.classList.add('hidden');
         }
 
-        // Function to reset the state for a specific converter type
-        function resetState(type) {
+        function resetConverterState(type) {
+            const messageAreaId = (type === 'pdf') ? 'message-pdf' : 'message-word';
             if (type === 'pdf') {
                 selectedFilePdf = null;
-                fileInputPdf.value = ''; // Clear the file input
+                fileInputPdf.value = '';
                 updateFileInfo(null, 'pdf');
                 convertButtonPdf.disabled = true;
-                hideProgress('pdf');
-                displayMessage('', 'clear', 'pdf');
+                hideConverterProgress('pdf');
             } else {
                 selectedFileWord = null;
-                fileInputWord.value = ''; // Clear the file input
+                fileInputWord.value = '';
                 updateFileInfo(null, 'word');
                 convertButtonWord.disabled = true;
-                hideProgress('word');
-                displayMessage('', 'clear', 'word');
+                hideConverterProgress('word');
             }
+            displayUserMessage(messageAreaId, '', 'clear');
         }
 
-
-        // --- Simulation Function ---
         function simulateConversion(type) {
             const file = (type === 'pdf') ? selectedFilePdf : selectedFileWord;
             const convertButton = (type === 'pdf') ? convertButtonPdf : convertButtonWord;
+            const messageAreaId = (type === 'pdf') ? 'message-pdf' : 'message-word';
 
-            if (!file) return; // Should not happen if button is enabled, but good practice
+            if (!file) return;
 
-            convertButton.disabled = true; // Disable button during conversion
-            displayMessage('', 'clear', type); // Clear previous messages
-
+            convertButton.disabled = true;
+            displayUserMessage(messageAreaId, '', 'clear');
             let progress = 0;
-            showProgress(progress, 'Uploading...', type);
+            showConverterProgress(progress, 'Uploading...', type);
 
-            // Simulate upload progress
             const uploadInterval = setInterval(() => {
                 progress += 10;
                 if (progress <= 100) {
-                    showProgress(progress, `Uploading... ${progress}%`, type);
+                    showConverterProgress(progress, `Uploading... ${progress}%`, type);
                 } else {
                     clearInterval(uploadInterval);
-                    showProgress(100, 'Processing...', type); // Indicate processing starts
-
-                    // Simulate backend conversion delay
+                    showConverterProgress(100, 'Processing...', type);
                     setTimeout(() => {
-                        // **IMPORTANT:** In a real application, this is where you would
-                        // receive the response from your backend server.
-                        // The backend would perform the actual conversion and
-                        // provide a download link or the converted file.
-
-                        // Simulate success
-                        const success = Math.random() > 0.1; // Simulate occasional failure
-
+                        const success = Math.random() > 0.1;
                         if (success) {
-                             const convertedFileType = (type === 'pdf') ? 'Word document' : 'PDF file';
-                             // Call displayMessage which now handles adding the download button
-                             displayMessage(`Success! Your ${convertedFileType} is ready.`, 'success', type);
-                             // The download button is added within displayMessage now.
+                            const convertedFileType = (type === 'pdf') ? 'Word document' : 'PDF file';
+                            const downloadFileName = (type === 'pdf') ? `${file.name.split('.')[0]}.docx` : `${file.name.split('.')[0]}.pdf`;
+                            displayUserMessage(messageAreaId, `Success! Your ${convertedFileType} is ready.`, 'success', '#', downloadFileName);
                         } else {
-                            displayMessage('Conversion failed. Please try again.', 'error', type);
+                            displayUserMessage(messageAreaId, 'Conversion failed. Please try again.', 'error');
                         }
-
-                        hideProgress(type); // Hide progress bar after completion/failure
-                        // Optionally reset state after a delay or keep file info
-                        // resetState(type); // Uncomment to fully reset after conversion attempt
-
-                        // Re-enable the convert button regardless of success/failure for retry
-                        if (type === 'pdf') {
-                            convertButtonPdf.disabled = !selectedFilePdf; // Re-enable only if file still selected
-                        } else {
-                            convertButtonWord.disabled = !selectedFileWord; // Re-enable only if file still selected
-                        }
-
-
-                    }, 2000); // Simulate 2 seconds processing time
+                        hideConverterProgress(type);
+                        if (type === 'pdf') convertButtonPdf.disabled = !selectedFilePdf;
+                        else convertButtonWord.disabled = !selectedFileWord;
+                    }, 2000);
                 }
-            }, 150); // Simulate upload speed
+            }, 150);
         }
 
-        // --- Event Listeners ---
-
-        // Drag and Drop Setup for PDF
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropAreaPdf.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-            }, false);
-        });
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropAreaPdf.addEventListener(eventName, () => dropAreaPdf.classList.add('drag-over'), false);
-        });
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropAreaPdf.addEventListener(eventName, () => dropAreaPdf.classList.remove('drag-over'), false);
-        });
-        dropAreaPdf.addEventListener('drop', (e) => handleFileSelect(e, 'pdf'), false);
-        fileInputPdf.addEventListener('change', (e) => handleFileSelect(e, 'pdf')); // Handle click selection
-
-         // Drag and Drop Setup for Word
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropAreaWord.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-            }, false);
-        });
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropAreaWord.addEventListener(eventName, () => dropAreaWord.classList.add('drag-over'), false);
-        });
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropAreaWord.addEventListener(eventName, () => dropAreaWord.classList.remove('drag-over'), false);
-        });
-        dropAreaWord.addEventListener('drop', (e) => handleFileSelect(e, 'word'), false);
-        fileInputWord.addEventListener('change', (e) => handleFileSelect(e, 'word')); // Handle click selection
-
-
-        // Conversion Button Click Handler (delegates based on current tab)
         function handleConvert(type) {
              simulateConversion(type);
         }
 
+
+        // --- PDF Tools UI Management ---
+        function showPdfToolsGrid() {
+            pdfToolsGrid.style.display = 'grid'; // Or 'flex' etc. depending on desired layout
+            pdfToolContentArea.style.display = 'none';
+            backToToolsButton.classList.add('hidden');
+            toolContentSections.forEach(section => section.classList.remove('active'));
+            activePdfTool = null;
+        }
+
+        function showPdfToolInterface(toolId) {
+            activePdfTool = toolId;
+            pdfToolsGrid.style.display = 'none';
+            pdfToolContentArea.style.display = 'block';
+            backToToolsButton.classList.remove('hidden');
+
+            toolContentSections.forEach(section => {
+                section.classList.toggle('active', section.id === toolId);
+            });
+            // Scroll to the top of the tool content area
+            pdfToolContentArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            displayUserMessage(`message-${toolId.replace('tool-', '')}`, '', 'clear'); // Clear previous messages for this tool
+        }
+
+        // --- PDF Tool Specific Functions (Placeholders) ---
+        // Note: `pdfjsLib` and `PDFLib` would be available if you uncomment their script tags.
+
+        // 1. PDF Viewer
+        const viewerFileInput = document.getElementById('viewer-file-input');
+        const viewerCanvas = document.getElementById('pdf-viewer-canvas');
+        const viewerCtx = viewerCanvas.getContext('2d');
+        const viewerPrevPage = document.getElementById('viewer-prev-page');
+        const viewerNextPage = document.getElementById('viewer-next-page');
+        const viewerPageNum = document.getElementById('viewer-page-num');
+        const viewerPageCount = document.getElementById('viewer-page-count');
+        const viewerZoomIn = document.getElementById('viewer-zoom-in');
+        const viewerZoomOut = document.getElementById('viewer-zoom-out');
+        let pdfDoc = null, pageNum = 1, pageRendering = false, pageNumPending = null, scale = 1.5;
+
+        function renderPage(num) {
+            if (!pdfDoc) return;
+            pageRendering = true;
+            pdfDoc.getPage(num).then(page => {
+                const viewport = page.getViewport({ scale: scale });
+                viewerCanvas.height = viewport.height;
+                viewerCanvas.width = viewport.width;
+                const renderContext = { canvasContext: viewerCtx, viewport: viewport };
+                const renderTask = page.render(renderContext);
+                renderTask.promise.then(() => {
+                    pageRendering = false;
+                    if (pageNumPending !== null) { renderPage(pageNumPending); pageNumPending = null; }
+                });
+            });
+            viewerPageNum.textContent = num;
+        }
+        function queueRenderPage(num) { if (pageRendering) { pageNumPending = num; } else { renderPage(num); } }
+        viewerPrevPage.addEventListener('click', () => { if (pageNum <= 1) return; pageNum--; queueRenderPage(pageNum); });
+        viewerNextPage.addEventListener('click', () => { if (pageNum >= pdfDoc.numPages) return; pageNum++; queueRenderPage(pageNum); });
+        viewerZoomIn.addEventListener('click', () => { scale += 0.2; queueRenderPage(pageNum); });
+        viewerZoomOut.addEventListener('click', () => { if (scale <= 0.3) return; scale -= 0.2; queueRenderPage(pageNum); });
+
+        if (viewerFileInput) {
+            viewerFileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file && file.type === "application/pdf") {
+                    if (typeof pdfjsLib === 'undefined') {
+                        displayUserMessage('message-viewer', 'pdf.js library is not loaded. Cannot view PDF.', 'error');
+                        return;
+                    }
+                    const fileReader = new FileReader();
+                    fileReader.onload = function() {
+                        const typedarray = new Uint8Array(this.result);
+                        pdfjsLib.getDocument(typedarray).promise.then(pdfDoc_ => {
+                            pdfDoc = pdfDoc_;
+                            viewerPageCount.textContent = pdfDoc.numPages;
+                            pageNum = 1;
+                            scale = 1.5; // Reset scale
+                            renderPage(pageNum);
+                            displayUserMessage('message-viewer', 'PDF loaded.', 'success');
+                        }).catch(err => displayUserMessage('message-viewer', 'Error loading PDF: ' + err.message, 'error'));
+                    };
+                    fileReader.readAsArrayBuffer(file);
+                } else {
+                    displayUserMessage('message-viewer', 'Please select a valid PDF file.', 'error');
+                }
+            });
+        } else { console.warn("PDF Viewer elements not all found"); }
+
+        // 2. Merge PDFs
+        const mergeFileInput = document.getElementById('merge-file-input');
+        const mergeFileList = document.getElementById('merge-file-list');
+        const mergeActionButton = document.getElementById('merge-action-button');
+        let filesToMerge = [];
+
+        if (mergeFileInput) {
+            mergeFileInput.addEventListener('change', (event) => {
+                filesToMerge = Array.from(event.target.files);
+                mergeFileList.innerHTML = filesToMerge.map(f => `<div>${f.name}</div>`).join('');
+                displayUserMessage('message-merge', `${filesToMerge.length} file(s) selected for merging.`, 'info');
+            });
+        }
+        if (mergeActionButton) {
+            mergeActionButton.addEventListener('click', async () => {
+                if (filesToMerge.length < 2) {
+                    displayUserMessage('message-merge', 'Please select at least two PDF files to merge.', 'error');
+                    return;
+                }
+                if (typeof PDFLib === 'undefined') {
+                     displayUserMessage('message-merge', 'pdf-lib library is not loaded. Cannot merge PDFs.', 'error'); return;
+                }
+                displayUserMessage('message-merge', 'Merging PDFs... please wait.', 'info');
+                try {
+                    const { PDFDocument } = PDFLib;
+                    const mergedPdf = await PDFDocument.create();
+                    for (const file of filesToMerge) {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const pdf = await PDFDocument.load(arrayBuffer);
+                        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                        copiedPages.forEach(page => mergedPdf.addPage(page));
+                    }
+                    const mergedPdfBytes = await mergedPdf.save();
+                    const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+                    const url = URL.createObjectURL(blob);
+                    displayUserMessage('message-merge', 'PDFs merged successfully!', 'success', url, 'merged.pdf');
+                } catch (e) {
+                    displayUserMessage('message-merge', `Error merging PDFs: ${e.message}`, 'error');
+                }
+            });
+        }
+
+        // 3. Split PDF
+        const splitFileInput = document.getElementById('split-file-input');
+        const splitPageRanges = document.getElementById('split-page-ranges');
+        const splitActionButton = document.getElementById('split-action-button');
+        if (splitActionButton) {
+            splitActionButton.addEventListener('click', () => {
+                const file = splitFileInput.files[0];
+                const ranges = splitPageRanges.value;
+                if (!file || !ranges) { displayUserMessage('message-split', 'Please select a PDF and enter page ranges.', 'error'); return; }
+                if (typeof PDFLib === 'undefined') {
+                     displayUserMessage('message-split', 'pdf-lib library is not loaded. Cannot split PDF.', 'error'); return;
+                }
+                displayUserMessage('message-split', 'Splitting PDF... (Simulated - full implementation complex)', 'info');
+                 // Actual implementation would involve parsing ranges, loading PDF, creating new PDFs with pdf-lib
+                setTimeout(() => displayUserMessage('message-split', 'PDF splitting simulated. Download links would appear here.', 'success', '#', 'split-part-1.pdf'), 2000);
+            });
+        }
+
+        // 4. PDF Annotation
+        const annotateFileInput = document.getElementById('annotate-file-input');
+        const annotateActionButton = document.getElementById('annotate-action-button');
+        if (annotateActionButton) {
+            annotateActionButton.addEventListener('click', () => {
+                const file = annotateFileInput.files[0];
+                if (!file) { displayUserMessage('message-annotate', 'Please select a PDF to annotate.', 'error'); return; }
+                if (typeof PDFLib === 'undefined') {
+                     displayUserMessage('message-annotate', 'pdf-lib library is not loaded. Cannot annotate PDF.', 'error'); return;
+                }
+                displayUserMessage('message-annotate', 'Annotating PDF... (Simulated)', 'info');
+                // Actual implementation: Load PDF with pdf-lib, add annotations (text, shapes) based on user input through a viewer.
+                setTimeout(() => displayUserMessage('message-annotate', 'Annotation saved (Simulated).', 'success', '#', 'annotated.pdf'), 2000);
+            });
+        }
+
+        // 5. Fill PDF Forms
+        const fillFormFileInput = document.getElementById('fillform-file-input');
+        const fillFormActionButton = document.getElementById('fillform-action-button');
+        if (fillFormActionButton) {
+            fillFormActionButton.addEventListener('click', () => {
+                const file = fillFormFileInput.files[0];
+                if (!file) { displayUserMessage('message-fillform', 'Please select a PDF form.', 'error'); return; }
+                if (typeof PDFLib === 'undefined') {
+                     displayUserMessage('message-fillform', 'pdf-lib library is not loaded. Cannot fill forms.', 'error'); return;
+                }
+                displayUserMessage('message-fillform', 'Filling form... (Simulated)', 'info');
+                // Actual implementation: Load PDF with pdf-lib, identify form fields, allow user input, save.
+                setTimeout(() => displayUserMessage('message-fillform', 'Form filled and saved (Simulated).', 'success', '#', 'filled-form.pdf'), 2000);
+            });
+        }
+
+        // 6. Text Extraction
+        const extractTextFileInput = document.getElementById('extracttext-file-input');
+        const extractTextActionButton = document.getElementById('extracttext-action-button');
+        const extractedTextArea = document.getElementById('extracted-text-area');
+        if (extractTextActionButton) {
+            extractTextActionButton.addEventListener('click', async () => {
+                const file = extractTextFileInput.files[0];
+                if (!file) { displayUserMessage('message-extracttext', 'Please select a PDF.', 'error'); return; }
+                if (typeof pdfjsLib === 'undefined') {
+                    displayUserMessage('message-extracttext', 'pdf.js library is not loaded. Cannot extract text.', 'error'); return;
+                }
+                displayUserMessage('message-extracttext', 'Extracting text...', 'info');
+                extractedTextArea.value = '';
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                    let fullText = '';
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        fullText += textContent.items.map(item => item.str).join(' ') + '\n';
+                    }
+                    extractedTextArea.value = fullText;
+                    displayUserMessage('message-extracttext', 'Text extracted successfully.', 'success');
+                } catch (e) {
+                    displayUserMessage('message-extracttext', `Error extracting text: ${e.message}`, 'error');
+                }
+            });
+        }
+
+        // 7. Image Extraction
+        const extractImageFileInput = document.getElementById('extractimage-file-input');
+        const extractImageActionButton = document.getElementById('extractimage-action-button');
+        const extractedImagesContainer = document.getElementById('extracted-images-container');
+        if (extractImageActionButton) {
+            extractImageActionButton.addEventListener('click', () => {
+                const file = extractImageFileInput.files[0];
+                if (!file) { displayUserMessage('message-extractimage', 'Please select a PDF.', 'error'); return; }
+                if (typeof pdfjsLib === 'undefined') { // pdf.js can help render pages to find images, but actual extraction is complex.
+                    displayUserMessage('message-extractimage', 'pdf.js library not loaded. Image extraction is complex client-side.', 'error'); return;
+                }
+                displayUserMessage('message-extractimage', 'Extracting images... (Simulated - very complex client-side)', 'info');
+                extractedImagesContainer.innerHTML = '<p class="text-sm col-span-full">Simulated: Image 1, Image 2 would appear here.</p>';
+                setTimeout(() => displayUserMessage('message-extractimage', 'Image extraction simulated.', 'success'), 2000);
+            });
+        }
+
+        // 8. PDF Compression
+        const compressFileInput = document.getElementById('compress-file-input');
+        const compressActionButton = document.getElementById('compress-action-button');
+        if (compressActionButton) {
+            compressActionButton.addEventListener('click', () => {
+                const file = compressFileInput.files[0];
+                if (!file) { displayUserMessage('message-compress', 'Please select a PDF to compress.', 'error'); return; }
+                if (typeof PDFLib === 'undefined') { // pdf-lib might offer some image optimization options.
+                     displayUserMessage('message-compress', 'pdf-lib library is not loaded. Compression limited.', 'error'); return;
+                }
+                displayUserMessage('message-compress', 'Compressing PDF... (Simulated - true compression is server-side heavy)', 'info');
+                setTimeout(() => displayUserMessage('message-compress', 'PDF compression simulated.', 'success', '#', 'compressed.pdf'), 2000);
+            });
+        }
+
+        // 9. Add Watermarks
+        const watermarkFileInput = document.getElementById('watermark-file-input');
+        const watermarkActionButton = document.getElementById('watermark-action-button');
+        if (watermarkActionButton) {
+            watermarkActionButton.addEventListener('click', () => {
+                const file = watermarkFileInput.files[0];
+                const text = document.getElementById('watermark-text').value;
+                const imageFile = document.getElementById('watermark-image-input').files[0];
+                if (!file || (!text && !imageFile)) { displayUserMessage('message-watermark', 'Please select a PDF and provide watermark text or image.', 'error'); return; }
+                if (typeof PDFLib === 'undefined') {
+                     displayUserMessage('message-watermark', 'pdf-lib library is not loaded. Cannot add watermark.', 'error'); return;
+                }
+                displayUserMessage('message-watermark', 'Adding watermark... (Simulated)', 'info');
+                setTimeout(() => displayUserMessage('message-watermark', 'Watermark added (Simulated).', 'success', '#', 'watermarked.pdf'), 2000);
+            });
+        }
+
+        // 10. Password Protection
+        const passwordFileInput = document.getElementById('password-file-input');
+        const encryptButton = document.getElementById('encrypt-action-button');
+        const decryptButton = document.getElementById('decrypt-action-button');
+        if (encryptButton) {
+            encryptButton.addEventListener('click', () => {
+                const file = passwordFileInput.files[0];
+                const pass = document.getElementById('pdf-password').value;
+                if (!file || !pass) { displayUserMessage('message-password', 'Please select PDF and enter password for encryption.', 'error'); return; }
+                if (typeof PDFLib === 'undefined') {
+                     displayUserMessage('message-password', 'pdf-lib library is not loaded. Cannot encrypt.', 'error'); return;
+                }
+                displayUserMessage('message-password', 'Encrypting PDF... (Simulated)', 'info');
+                setTimeout(() => displayUserMessage('message-password', 'PDF Encrypted (Simulated).', 'success', '#', 'encrypted.pdf'), 2000);
+            });
+        }
+        if (decryptButton) {
+            decryptButton.addEventListener('click', () => {
+                const file = passwordFileInput.files[0];
+                const pass = document.getElementById('pdf-password').value;
+                if (!file || !pass) { displayUserMessage('message-password', 'Please select PDF and enter password for decryption.', 'error'); return; }
+                if (typeof PDFLib === 'undefined') {
+                     displayUserMessage('message-password', 'pdf-lib library is not loaded. Cannot decrypt.', 'error'); return;
+                }
+                displayUserMessage('message-password', 'Decrypting PDF... (Simulated)', 'info');
+                setTimeout(() => displayUserMessage('message-password', 'PDF Decrypted (Simulated).', 'success', '#', 'decrypted.pdf'), 2000);
+            });
+        }
+
+        // 11. Digital Signatures
+        const signatureFileInput = document.getElementById('signature-file-input');
+        const signatureCanvas = document.getElementById('signature-pad-canvas');
+        const signatureActionButton = document.getElementById('signature-action-button');
+        const clearSignatureButton = document.getElementById('clear-signature-button');
+        let sigPadCtx, drawingSig = false;
+
+        if (signatureCanvas) {
+            sigPadCtx = signatureCanvas.getContext('2d');
+            sigPadCtx.strokeStyle = "#000";
+            sigPadCtx.lineWidth = 2;
+
+            signatureCanvas.addEventListener('mousedown', (e) => { drawingSig = true; sigPadCtx.beginPath(); sigPadCtx.moveTo(e.offsetX, e.offsetY); });
+            signatureCanvas.addEventListener('mousemove', (e) => { if (drawingSig) { sigPadCtx.lineTo(e.offsetX, e.offsetY); sigPadCtx.stroke(); } });
+            signatureCanvas.addEventListener('mouseup', () => { drawingSig = false; sigPadCtx.closePath(); });
+            signatureCanvas.addEventListener('mouseout', () => drawingSig = false); // Stop drawing if mouse leaves canvas
+        }
+        if (clearSignatureButton) {
+            clearSignatureButton.addEventListener('click', () => sigPadCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height));
+        }
+        if (signatureActionButton) {
+            signatureActionButton.addEventListener('click', () => {
+                const file = signatureFileInput.files[0];
+                if (!file) { displayUserMessage('message-signature', 'Please select a PDF to sign.', 'error'); return; }
+                // Check if signature is empty (e.g. by checking pixel data)
+                const isCanvasEmpty = !sigPadCtx.getImageData(0, 0, signatureCanvas.width, signatureCanvas.height).data.some(channel => channel !== 0);
+                if (isCanvasEmpty) { displayUserMessage('message-signature', 'Please draw a signature.', 'error'); return; }
+
+                if (typeof PDFLib === 'undefined') {
+                     displayUserMessage('message-signature', 'pdf-lib library is not loaded. Cannot sign.', 'error'); return;
+                }
+                displayUserMessage('message-signature', 'Signing PDF... (Simulated)', 'info');
+                // Actual: convert canvas to image, embed with pdf-lib
+                setTimeout(() => displayUserMessage('message-signature', 'PDF Signed (Simulated).', 'success', '#', 'signed.pdf'), 2000);
+            });
+        }
+
+        // 12. Search in PDF
+        const searchPdfFileInput = document.getElementById('searchpdf-file-input');
+        const searchPdfActionButton = document.getElementById('searchpdf-action-button');
+        if (searchPdfActionButton) {
+            searchPdfActionButton.addEventListener('click', () => {
+                const file = searchPdfFileInput.files[0];
+                const query = document.getElementById('searchpdf-query').value;
+                if (!file || !query) { displayUserMessage('message-searchpdf', 'Please select PDF and enter search query.', 'error'); return; }
+                // Requires integration with PDF Viewer that supports search highlighting (e.g., advanced pdf.js usage)
+                displayUserMessage('message-searchpdf', `Searching for "${query}"... (Simulated - requires viewer integration)`, 'info');
+            });
+        }
+
+        // 13. Metadata Editing
+        const metadataFileInput = document.getElementById('metadata-file-input');
+        const metadataActionButton = document.getElementById('metadata-action-button');
+        if (metadataActionButton) {
+            metadataActionButton.addEventListener('click', () => {
+                const file = metadataFileInput.files[0];
+                if (!file) { displayUserMessage('message-metadata', 'Please select a PDF to edit metadata.', 'error'); return; }
+                if (typeof PDFLib === 'undefined') {
+                     displayUserMessage('message-metadata', 'pdf-lib library is not loaded. Cannot edit metadata.', 'error'); return;
+                }
+                displayUserMessage('message-metadata', 'Saving metadata... (Simulated)', 'info');
+                // Actual: Load with pdf-lib, set metadata fields, save.
+                setTimeout(() => displayUserMessage('message-metadata', 'Metadata saved (Simulated).', 'success', '#', 'metadata-updated.pdf'), 2000);
+            });
+        }
+
+        // 14. Convert PDF to Images
+        const pdfToImageFileInput = document.getElementById('pdftoimage-file-input');
+        const pdfToImageActionButton = document.getElementById('pdftoimage-action-button');
+        const pdfToImageOutputContainer = document.getElementById('pdftoimage-output-container');
+        if (pdfToImageActionButton) {
+            pdfToImageActionButton.addEventListener('click', async () => {
+                const file = pdfToImageFileInput.files[0];
+                const format = document.getElementById('pdftoimage-format').value;
+                if (!file) { displayUserMessage('message-pdftoimage', 'Please select a PDF.', 'error'); return; }
+                if (typeof pdfjsLib === 'undefined') {
+                    displayUserMessage('message-pdftoimage', 'pdf.js library is not loaded. Cannot convert to images.', 'error'); return;
+                }
+                displayUserMessage('message-pdftoimage', `Converting to ${format.toUpperCase()}...`, 'info');
+                pdfToImageOutputContainer.innerHTML = '';
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                    for (let i = 1; i <= Math.min(pdf.numPages, 5); i++) { // Limit to 5 pages for demo
+                        const page = await pdf.getPage(i);
+                        const viewport = page.getViewport({ scale: 1.5 });
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+                        await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+                        const img = document.createElement('img');
+                        img.src = canvas.toDataURL(`image/${format}`);
+                        img.classList.add('w-full', 'h-auto', 'border', 'rounded', 'shadow');
+                        pdfToImageOutputContainer.appendChild(img);
+                    }
+                    displayUserMessage('message-pdftoimage', 'Conversion to images successful (first few pages shown).', 'success');
+                } catch (e) {
+                    displayUserMessage('message-pdftoimage', `Error converting to images: ${e.message}`, 'error');
+                }
+            });
+        }
+
+        // 15. Print PDF
+        const printFileInput = document.getElementById('print-file-input');
+        const printActionButton = document.getElementById('print-action-button');
+        if (printActionButton) {
+            printActionButton.addEventListener('click', () => {
+                const file = printFileInput.files[0];
+                if (!file) { displayUserMessage('message-print', 'Please select a PDF to print.', 'error'); return; }
+                try {
+                    const url = URL.createObjectURL(file);
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = url;
+                    document.body.appendChild(iframe);
+                    iframe.onload = () => {
+                        setTimeout(() => { // Timeout to ensure content is loaded in iframe
+                            iframe.contentWindow.focus();
+                            iframe.contentWindow.print();
+                            // Optional: Clean up iframe after print dialog, though might close too soon
+                            // setTimeout(() => { document.body.removeChild(iframe); URL.revokeObjectURL(url); }, 1000);
+                        }, 500);
+                    };
+                    displayUserMessage('message-print', 'Print dialog should open. If not, check browser pop-up blocker.', 'info');
+                } catch (e) {
+                     displayUserMessage('message-print', `Error preparing for print: ${e.message}`, 'error');
+                }
+            });
+        }
+
+
+        // --- Event Listeners ---
+        // Drag and Drop for PDF to Word
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => dropAreaPdf.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false));
+        ['dragenter', 'dragover'].forEach(eventName => dropAreaPdf.addEventListener(eventName, () => dropAreaPdf.classList.add('drag-over'), false));
+        ['dragleave', 'drop'].forEach(eventName => dropAreaPdf.addEventListener(eventName, () => dropAreaPdf.classList.remove('drag-over'), false));
+        dropAreaPdf.addEventListener('drop', (e) => handleFileSelect(e, 'pdf'), false);
+        fileInputPdf.addEventListener('change', (e) => handleFileSelect(e, 'pdf'));
+
+        // Drag and Drop for Word to PDF
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => dropAreaWord.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false));
+        ['dragenter', 'dragover'].forEach(eventName => dropAreaWord.addEventListener(eventName, () => dropAreaWord.classList.add('drag-over'), false));
+        ['dragleave', 'drop'].forEach(eventName => dropAreaWord.addEventListener(eventName, () => dropAreaWord.classList.remove('drag-over'), false));
+        dropAreaWord.addEventListener('drop', (e) => handleFileSelect(e, 'word'), false);
+        fileInputWord.addEventListener('change', (e) => handleFileSelect(e, 'word'));
+
+        // PDF Tool Card Clicks
+        toolCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const toolId = card.dataset.tool;
+                showPdfToolInterface(toolId);
+            });
+        });
+
+        // Back to Tools Button
+        backToToolsButton.addEventListener('click', showPdfToolsGrid);
+
+
         // --- Initialization ---
         currentYearSpan.textContent = new Date().getFullYear();
-        // Initial tab setup (redundant due to default class, but safe)
-        switchTab('pdf-to-word');
+        switchMainTab('converters'); // Start with converters tab
+        switchConverterTab('pdf-to-word'); // Default converter sub-tab
+        showPdfToolsGrid(); // Initialize PDF tools view to grid, but it will be hidden by main tab logic initially
+
+        // Check for required libraries and warn if not present
+        // This is a good practice for tools relying on external scripts
+        // Ensure these checks run after a brief moment to allow CDNs to load
+        setTimeout(() => {
+            if (typeof pdfjsLib === 'undefined') {
+                console.warn("pdf.js library not found. Some PDF tools (Viewer, Text/Image Extraction, PDF to Images) will not function fully.");
+                // Optionally display a general warning to the user
+            } else {
+                 // Make sure to set the workerSrc for pdf.js
+                 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.107/pdf.worker.min.js'; // Use a recent version
+            }
+            if (typeof PDFLib === 'undefined') {
+                console.warn("pdf-lib.js library not found. Some PDF tools (Merge, Split, Annotate, etc.) will not function fully.");
+            }
+        }, 1000);
 
     </script>
-
 </body>
 </html>
